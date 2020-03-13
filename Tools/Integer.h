@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <string>
+#include "alg.h"
 #include "bitop.h"
 
 #pragma warning( push )
@@ -13,11 +14,10 @@ namespace tools {
 	class Int {
 	public:
 		using value_type = unsigned char;
-	private:
-		template<class it, class T = void>
-		using enable_if_InputItr = typename std::enable_if_t<std::is_convertible<typename std::iterator_traits<it>::iterator_category, std::input_iterator_tag>::value, T>;
+	protected:
 		std::vector<value_type> data;
 		bool hiOne;
+	private:
 		Int(size_t count, value_type val) :hiOne(false), data(count, val) { }
 	public:
 		Int()noexcept:hiOne(false){}
@@ -32,7 +32,7 @@ namespace tools {
 		Int(unsigned int val) :Int(static_cast<value_type>(val)) {}
 
 		Int(std::initializer_list<value_type> ilist, bool neg = false) :hiOne(neg), data(std::move(ilist)) { shrink(); }
-		template <class InputIt, class = enable_if_InputItr<InputIt>>
+		template <class InputIt, class = alg::enable_if_InputItr<InputIt>>
 		Int(InputIt first, InputIt last, bool neg=false) : hiOne(neg), data(std::move(first), std::move(last)) { shrink(); }
 
 		Int& operator=(const Int& other) {
@@ -45,7 +45,7 @@ namespace tools {
 			data = std::move(other.data);
 			return *this;
 		}
-	private:
+	protected:
 		bool shrink() {
 			auto end = data.crend(), begin = data.crbegin();
 			if (begin == end) return false;
@@ -59,18 +59,8 @@ namespace tools {
 			}
 			else
 				return false;
-			/*
-			auto end = data.cend(), begin = data.cbegin();
-			if (begin == end) return false;
-			auto cmp = hiOne ? bitop::fullmask<value_type> : 0;
-			auto it = end;
-			do { --it; } while (*it == cmp && it != begin);
-			if (*it != cmp) ++it;
-			bool res = it != end;
-			data.erase(it, end);
-			return res;
-			*/
 		}
+	private:
 		bool addOne() {
 			for (auto it = data.begin(), end = data.end(); it != end; ++it)
 				if (*it == bitop::fullmask<value_type>)	*it = 0;
