@@ -1,4 +1,6 @@
-﻿#include <algorithm>
+﻿#define _CRT_SECURE_NO_WARNINGS
+
+#include <algorithm>
 #include <iostream>
 #include <chrono>
 #include <ratio>
@@ -9,12 +11,13 @@
 #include <string>
 #include <iomanip>
 #include <Windows.h>
-#include "arrvec.h"
-#include "Integer.h"
-#include "bitop.h"
-#include "alg.h"
+#include "../Tools/arrvec.h"
+#include "../Tools/Integer.h"
+#include "../Tools/bitop.h"
+#include "../Tools/alg.h"
 #include <random>
 #include <numeric>
+#include <time.h>
 
 
 using namespace tools;
@@ -126,8 +129,15 @@ double timing(size_t u, size_t blocks_num) {
 
 
 int main() {
+	while (true) {
+		auto test = randomInt(gen, 5);
+		auto test2 = randomInt(gen, 5);
+		test -= test2;
+		cout << test.to_bstring() << endl;
+		system("pause");
+	}
 	std::uniform_int_distribution<> dis{0,255};
-	std::uniform_int_distribution<> dis_n{10,10000};
+	std::uniform_int_distribution<> dis_n{1000,100000};
 	std::uniform_real_distribution<> dis_r{0,10};
 
 	std::uniform_int_distribution<unsigned short> dis_s{0,(unsigned short)(-1)};
@@ -167,83 +177,7 @@ int main() {
 		}
 		//system("pause");
 	}
-
-
-	while (true) {
-		alg::int_u_t<16> m1 = rand_of<unsigned>() % 256;
-		alg::int_u_t<16> m2 = rand_of<unsigned>() % 256;
-		alg::int_u_t<16> m3 = rand_of<unsigned>() % 256;
-		if (m1 == 1 || m2 == 1 || m3 == 1)continue;
-		if (std::gcd(m1, m2) != 1)continue;
-		if (std::gcd(m1, m3) != 1)continue;
-		if (std::gcd(m3, m2) != 1)continue;
-
-		system("cls");
-		auto MAX = static_cast<alg::int_u_t<64>>(m1)* m2* m3;
-		cout << "m1 = " << setw(4) << m1 << "\tm2 = " << setw(4) << m2 << "\tm3 = " << setw(4) << m3 << "\tMAX = " << setw(6) << MAX << endl;
-		auto crt = alg::mod::CRT_3(m1, m2, m3);
-
-		for (auto c = 0; c < 128; ++c) {
-			alg::int_u_t<32> ans = rand_of<unsigned long long>() % MAX;
-			alg::int_u_t<16> a1 = ans % m1;
-			alg::int_u_t<16> a2 = ans % m2;
-			alg::int_u_t<16> a3 = ans % m3;
-
-			auto [h, l] = crt(a1, a2, a3);
-			alg::int_u_t<32> res = (static_cast<unsigned int>(h) << 16) + static_cast<unsigned int>(l);
-			cout << "ans = " << setw(7) << ans << " = ( " << setw(4) << a1 << ", " << setw(4) << a2 << ", " << setw(4) << a3 << ") = res = " << setw(7) << res << ((ans == res) ? "\tEqual" : "\tWrong") << endl;
-			if (ans != res) {
-				cout << "ERROR!! ^^^" << endl;
-				return 0;
-			}
-		}
-		//system("pause");
-	}
-	return 0;
 	*/
-/**
-	while (true) {
-		system("cls");
-		auto t = rand_of<unsigned short>();
-		cout << bitop::to_string(t) << endl;
-		cout << bitop::to_string(bitop::reverse(t)) << endl;
-		cout << bitop::to_string(bitop::reverse(t,16)) << endl;
-		cout << bitop::to_string(bitop::reverse(t,15)) << endl;
-		cout << bitop::to_string(bitop::reverse(t,14)) << endl;
-		cout << bitop::to_string(bitop::reverse(t,13)) << endl;
-		cout << bitop::to_string(bitop::reverse(t,12)) << endl;
-		cout << bitop::to_string(bitop::reverse(t,11)) << endl;
-		cout << bitop::to_string(bitop::reverse(t,10)) << endl;
-		cout << bitop::to_string(bitop::reverse(t,9)) << endl;
-		cout << bitop::to_string(bitop::reverse(t,8)) << endl;
-		cout << bitop::to_string(bitop::reverse(t,7)) << endl;
-		cout << bitop::to_string(bitop::reverse(t,6)) << endl;
-		cout << bitop::to_string(bitop::reverse(t,5)) << endl;
-		cout << bitop::to_string(bitop::reverse(t,4)) << endl;
-		cout << bitop::to_string(bitop::reverse(t,3)) << endl;
-		cout << bitop::to_string(bitop::reverse(t,2)) << endl;
-		cout << bitop::to_string(bitop::reverse(t,1)) << endl;
-		cout << bitop::to_string(bitop::reverse(t,0)) << endl;
-		system("pause");
-	}
-	/*
-	{
-		typedef complex<double> cx;
-		vector<cx>a;
-		unsigned l2n = 7;
-		auto len = [](unsigned l) {return 1ull << l; };
-		std::generate_n(back_insert_iterator(a), 1u << l2n+1, [&] {return cx{dis_r(gen) + 0.0,0}; });
-		auto b = a;
-		//cout << "a = ";	copy(a.cbegin(), a.cend(), ostream_iterator<cx>(cout, ", "));	cout << endl;
-		alg::RotationSumTransform_base2(a.begin(), exp(-cx(0, 2 * Pi / (len(l2n + 1)))), l2n + 1ull);
-		//cout << "a = ";	copy(a.cbegin(), a.cend(), ostream_iterator<cx>(cout, ", "));	cout << endl;
-		alg::RotationSumTransform_base2(a.begin(), exp(cx(0, 2 * Pi / (len(l2n + 1)))), l2n + 1ull);
-		transform(a.begin(), a.end(), a.begin(), [&](cx x) {return x / cx{0.0 + len(l2n + 1),0}; });
-		//cout << "a = ";	copy(a.cbegin(), a.cend(), ostream_iterator<cx>(cout, ", "));	cout << endl;
-		cout << "err: " << inner_product(a.cbegin(), a.cend(), b.cbegin(), 0.0, std::plus{}, [](cx a, cx b) {return norm(a - b); }) << endl;
-		return 0;
-	}
-	/**/
 
 	double alpha = 0, gamma = 0, gamma2 = 0;
 	for (int i = 0; i < 25;++i) {
@@ -271,42 +205,6 @@ int main() {
 			alpha = alg::next_avg(alpha, i, dur.count() / (a.size() * b.size()));
 		}
 		c.clear();
-		/*
-		{
-			const auto tis(std::chrono::high_resolution_clock::now());
-
-			auto A = a, B = b;
-			vector<alg::int_u_t<64>> C;
-
-			A.resize(len, 0);
-			B.resize(len, 0);
-			C.reserve(len);
-
-
-			unsigned long long mod = 3221225473;
-			unsigned long long alpha = alg::mod::pow(mod)(125ull, 1ull << (30 - logn));
-			unsigned long long ialpha = alg::mod::inv(mod)(alpha);
-			alg::RotationSumTransform_base2(A.begin(), alpha, logn, 1, 0, alg::mod::mult(mod), alg::mod::mult(mod),	alg::mod::minus(mod), alg::mod::plus(mod));
-			alg::RotationSumTransform_base2(B.begin(), alpha, logn, 1, 0, alg::mod::mult(mod), alg::mod::mult(mod), alg::mod::minus(mod), alg::mod::plus(mod));
-			transform(A.cbegin(), A.cend(), B.cbegin(), back_insert_iterator(C), [mod](auto a, auto b) {return alg::mod::mult(mod)(a, b); });
-			alg::RotationSumTransform_base2(C.begin(), ialpha, logn, 1, 0, alg::mod::mult(mod), alg::mod::mult(mod), alg::mod::minus(mod), alg::mod::plus(mod));
-
-			auto Ninv = alg::mod::inv(mod)(len);
-			transform(C.cbegin(), C.cend(), back_insert_iterator(c), [Ninv, mod](auto c) {return alg::mod::mult(mod)(c, Ninv); });
-			{
-				auto itnz = c.cbegin();
-				for (auto it = itnz, end = c.cend(); it != end; ++it)
-					if (*it)itnz = it;
-				c.erase(itnz + 1, c.cend());
-			}
-
-			const auto tic(std::chrono::high_resolution_clock::now());
-			//cout << "c2 = "; copy(c.cbegin(), c.cend(), ostream_iterator<alg::int_u_t<64>>(cout, ", ")); 
-			std::chrono::duration<double, std::ratio_multiply<std::chrono::duration<double>::period, std::nano>> dur(tic - tis);
-			std::cout << "\t" << fixed << setprecision(3) << dur.count() / 1000000 << "ms gamma: " << dur.count() / (len * logn) << flush;
-			gamma = alg::next_avg(gamma, i, dur.count() / (len * logn));
-		}
-		*/
 		{
 			const auto tis(std::chrono::high_resolution_clock::now());
 			c = a;
@@ -333,83 +231,6 @@ int main() {
 		
 	}
 	cout << "alpha: " << alpha << "\tgamma: " << gamma << "\tgamma2: " << gamma2 << endl;
-	return 0;
-	/**
-	typedef complex<double> cx;
-	vector<cx>a, b, c;
-	unsigned cn = 1;
-	for (unsigned l2n = 1; l2n < 16; ++cn) {
-		std::cout << l2n << ", " ;
-		auto len = [](unsigned l) {return 1ull << l; };
-		a.clear();
-		b.clear();
-		for (auto i = 0u; i < 1u << l2n; ++i) {
-			a.push_back({dis_r(gen) + 0.0,0});
-			b.push_back({dis_r(gen) + 0.0,0});
-		}
-		c.resize(len(l2n+1), {0,0});
-		c.clear();
-		{
-			const auto tis(std::chrono::high_resolution_clock::now());
-			c.reserve(len(l2n+1));
-			alg::convolution_linear(a.cbegin(), a.cend(), b.cbegin(), b.cend(), back_insert_iterator(c), cx(0, 0));
-			const auto tic(std::chrono::high_resolution_clock::now());
-			std::chrono::duration<double, std::ratio_multiply<std::chrono::duration<double>::period, std::nano>> dur(tic - tis);
-			std::cout << fixed << setprecision(3) << dur.count() / 1000.0 << ", ";
-		}
-		auto d = c;
-		c.clear();
-		{
-			const auto tis(std::chrono::high_resolution_clock::now());
-			a.resize(len(l2n+1), {0,0});
-			b.resize(len(l2n+1), {0,0});
-			c.reserve(len(l2n+1));
-			alg::RotationSumTransform_base2(a.begin(), exp(-cx(0, 2 * Pi / (len(l2n+1)))), l2n + 1ull);
-			alg::RotationSumTransform_base2(b.begin(), exp(-cx(0, 2 * Pi / (len(l2n+1)))), l2n + 1ull);
-			for (auto i = 0u; i < 1u << (l2n + 1); ++i) c.push_back(a[i] * b[i]);
-			alg::RotationSumTransform_base2(c.begin(), exp(cx(0, 2 * Pi / (len(l2n+1)))), l2n + 1ull);
-			c.pop_back();
-			const auto tic(std::chrono::high_resolution_clock::now());
-			std::chrono::duration<double, std::ratio_multiply<std::chrono::duration<double>::period, std::nano>> dur(tic - tis);
-			std::cout << fixed << setprecision(3) << dur.count() / 1000.0 << ", ";
-		}
-		double err = 0;
-		for (auto i = 0; i < c.size(); ++i)
-			err += (0.0+d[i] - c[i] / cx(0.0 + (len(l2n + 1)), 0.0)).real() * (0.0 + d[i] - c[i] / cx(0.0+len(l2n + 1), 0.0)).real();
-		std::cout << "err: " << err << endl;
-		if (cn % 3 == 0) ++l2n;
-	}
-/*
-	for (auto count = 0; count < 2048; ++count) {
-		//std::cout << "test no." << (count + 1) << ":" << std::endl;
-		std::vector<int> init;
-		std::generate_n(std::back_inserter(init), dis_n(gen), [&] {return dis(gen); });
-		Int a(init.begin(), init.end(), dis(gen) > 127); init.clear();
-		std::generate_n(std::back_inserter(init), dis_n(gen), [&] {return dis(gen); });
-		Int b(init.begin(), init.end(), dis(gen) > 127); init.clear();
-		std::generate_n(std::back_inserter(init), dis_n(gen), [&] {return dis(gen); });
-		//Int c(init.begin(), init.end(), dis(gen) > 127); init.clear();
-		if (b == 0)++b;
-#define T(exp) std::cout << std::setw(7) << #exp << ": " << (exp).to_bstring(7, true) << std::endl;
-#define B(exp) std::cout << std::setw(7) << #exp << ": " << std::boolalpha <<(exp) << std::endl;
-
-		std::cout << "{" << std::endl;
-		a.print();
-		std::cout << "," << std::endl;
-		b.print();
-		std::cout << "," << std::endl;
-		(a + b).print();
-		std::cout << "," << std::endl;
-		(a - b).print();
-		std::cout << "," << std::endl;
-		(a * b).print();
-		std::cout << "," << std::endl;
-		(a / b).print();
-		std::cout << "," << std::endl;
-		(a % b).print();
-		std::cout << "}," << std::endl;
-	}
-	*/
 	return 0;
 
 }
